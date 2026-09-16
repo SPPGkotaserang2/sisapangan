@@ -280,12 +280,12 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Karbo (Kg)</th>
+                            <th>Karbohidrat (Kg)</th>
                             <th>Protein (Kg)</th>
                             <th>Sayur (Kg)</th>
                             <th>Buah (Kg)</th>
                             <th>Total (Kg)</th>
-                            <th>Ket. Karbo</th>
+                            <th>Ket. Karbohidrat</th>
                             <th>Ket. Protein</th>
                             <th>Ket. Sayur</th>
                             <th>Ket. Buah</th>
@@ -332,12 +332,12 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Karbo (Kg)</th>
+                            <th>Karbohidrat (Kg)</th>
                             <th>Protein (Kg)</th>
                             <th>Sayur (Kg)</th>
                             <th>Buah (Kg)</th>
                             <th>Total (Kg)</th>
-                            <th>Ket. Karbo</th>
+                            <th>Ket. Karbohidrat</th>
                             <th>Ket. Protein</th>
                             <th>Ket. Sayur</th>
                             <th>Ket. Buah</th>
@@ -832,7 +832,7 @@
                 ["LAPORAN PENDATAAN SISA MAKANAN DARI FOODTRAY"],
                 [`Periode: ${mulaiFormatted} s/d ${sampaiFormatted}`],
                 [],
-                ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
+                ["No", "Tanggal", "Karbohidrat (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbohidrat", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
             ];
 
             data.forEach((item, idx) => {
@@ -858,7 +858,7 @@
             let mulaiFormatted = formatTanggalID(mulai);
             let sampaiFormatted = formatTanggalID(sampai);
 
-            // Kop Laporan Berkelir Biru Solid (Tanpa teks sistem di dalam kurung)
+            // Kop Laporan Berkelir Biru Solid
             doc.setFillColor(27, 79, 114); // #1b4f72
             doc.rect(0, 0, doc.internal.pageSize.getWidth(), 25, 'F');
 
@@ -893,7 +893,7 @@
 
             doc.autoTable({
                 startY: 32,
-                head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
+                head: [['No', 'Tanggal', 'Karbohidrat', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbohidrat', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
                 body: tableRows,
                 theme: 'grid',
                 headStyles: { 
@@ -911,24 +911,24 @@
                 columnStyles: {
                     0: { cellWidth: 10, halign: 'center' }, 
                     1: { cellWidth: 25, halign: 'center' }, 
-                    2: { cellWidth: 20, halign: 'center' }, 
-                    3: { cellWidth: 20, halign: 'center' }, 
-                    4: { cellWidth: 20, halign: 'center' }, 
-                    5: { cellWidth: 20, halign: 'center' }, 
-                    6: { cellWidth: 20, halign: 'center' }, 
-                    7: { cellWidth: 35 }, 
-                    8: { cellWidth: 35 }, 
-                    9: { cellWidth: 35 }, 
-                    10: { cellWidth: 35 } 
+                    2: { cellWidth: 24, halign: 'center' }, // Diperlebar agar "Karbohidrat" satu baris
+                    3: { cellWidth: 18, halign: 'center' }, 
+                    4: { cellWidth: 18, halign: 'center' }, 
+                    5: { cellWidth: 18, halign: 'center' }, 
+                    6: { cellWidth: 18, halign: 'center' }, 
+                    7: { cellWidth: 33 }, // Diperlebar agar "Ket. Karbohidrat" muat dengan baik
+                    8: { cellWidth: 30 }, 
+                    9: { cellWidth: 30 }, 
+                    10: { cellWidth: 30 } 
                 },
-                foot: [[{ content: 'Total:', colSpan: 6, styles: { halign: 'right' } }, `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
+                foot: [[{ content: 'Total Keseluruhan :', colSpan: 6, styles: { halign: 'right' } }, `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
                 footStyles: { 
                     fillColor: [238, 238, 238], 
                     textColor: [0, 0, 0], 
                     fontStyle: 'bold' 
                 },
                 didDrawPage: function (data) {
-                    // Halaman bawah dikosongkan (nomor halaman dihilangkan)
+                    // Halaman bawah dikosongkan
                 }
             });
 
