@@ -11,37 +11,41 @@
     
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: #2c3e50;
         }
         .container {
             max-width: 1250px;
             margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(27, 79, 114, 0.1);
+            border-top: 5px solid #1b4f72;
         }
         .header-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            border-bottom: 2px solid #ebf2f7;
+            padding-bottom: 15px;
         }
         h2 {
             margin: 0;
-            color: #2c3e50;
+            color: #1b4f72;
+            font-size: 24px;
         }
 
         /* Widget Jadwal Sholat & Waktu */
         .sholat-widget {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #1b4f72, #2980b9);
             color: white;
-            padding: 12px 18px;
-            border-radius: 6px;
+            padding: 14px 20px;
+            border-radius: 8px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
@@ -49,7 +53,7 @@
             flex-wrap: wrap;
             gap: 10px;
             font-size: 13px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 6px rgba(27, 79, 114, 0.2);
         }
         .sholat-widget div {
             display: flex;
@@ -57,27 +61,33 @@
             flex-wrap: wrap;
         }
         .sholat-item {
-            background: rgba(255,255,255,0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 10px;
+            border-radius: 5px;
         }
 
         .btn {
-            padding: 8px 12px;
+            padding: 9px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             text-decoration: none;
             display: inline-block;
             font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .btn-primary { background-color: #3498db; color: white; }
-        .btn-success { background-color: #2ecc71; color: white; }
-        .btn-danger { background-color: #e74c3c; color: white; }
-        .btn-secondary { background-color: #95a5a6; color: white; }
-        .btn-warning { background-color: #f39c12; color: white; }
-        .btn-sm { padding: 4px 8px; font-size: 12px; }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .btn-primary { background-color: #2980b9; color: white; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-danger { background-color: #c0392b; color: white; }
+        .btn-secondary { background-color: #7f8c8d; color: white; }
+        .btn-warning { background-color: #d35400; color: white; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
         
         table {
             width: 100%;
@@ -86,37 +96,48 @@
             margin-bottom: 15px;
         }
         table, th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #d5dbdb;
         }
         th, td {
-            padding: 8px;
+            padding: 10px 8px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
         }
         th {
-            background-color: #2c3e50;
+            background-color: #1b4f72;
             color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9f9;
         }
         input[type="date"], input[type="text"] {
             width: 100%;
-            padding: 6px;
+            padding: 7px;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
         }
         input[readonly] {
-            background-color: #e9ecef;
+            background-color: #eaeded;
+            color: #7f8c8d;
         }
         .action-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
         .arsip-section {
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 2px dashed #ccc;
+            border-top: 2px dashed #bdc3c7;
         }
 
         /* Tampilan Pemberitahuan Profesional di Antarmuka Web */
@@ -127,20 +148,20 @@
             gap: 10px;
         }
         .alert-banner {
-            padding: 12px 16px;
+            padding: 12px 18px;
             border-radius: 6px;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border-left: 5px solid rgba(0,0,0,0.2);
         }
         .alert-success { background-color: #27ae60; border-left-color: #1e8449; }
         .alert-danger { background-color: #c0392b; border-left-color: #962d22; }
         .alert-info { background-color: #2980b9; border-left-color: #1f618d; }
-        .alert-motivation { background-color: #8e44ad; border-left-color: #512e5f; }
+        .alert-motivation { background-color: #1b4f72; border-left-color: #11334a; }
         .close-alert {
             background: none;
             border: none;
@@ -150,9 +171,7 @@
             font-weight: bold;
             opacity: 0.8;
         }
-        .close-alert:hover {
-            opacity: 1;
-        }
+        .close-alert:hover { opacity: 1; }
 
         /* Modal Umum */
         .modal {
@@ -167,18 +186,20 @@
         .modal-content {
             background: white;
             padding: 25px;
-            border-radius: 8px;
-            width: 350px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            width: 380px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-top: 4px solid #2980b9;
         }
         .modal-content label {
             display: block;
-            margin-top: 10px;
+            margin-top: 12px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 600;
+            color: #1b4f72;
         }
         .modal-content input {
-            margin-top: 5px;
+            margin-top: 6px;
             margin-bottom: 15px;
         }
         .modal-buttons {
@@ -249,7 +270,7 @@
                             <td><input type="text" name="ket_protein[]" placeholder="Keterangan..."></td>
                             <td><input type="text" name="ket_sayur[]" placeholder="Keterangan..."></td>
                             <td><input type="text" name="ket_buah[]" placeholder="Keterangan..."></td>
-                            <td><button type="button" class="btn btn-danger" onclick="window.hapusBaris(this)">Hapus</button></td>
+                            <td><button type="button" class="btn btn-danger btn-sm" onclick="window.hapusBaris(this)">Hapus</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -267,7 +288,7 @@
         <!-- Bagian Tampilan Data Berdasarkan Tanggal -->
         <div class="arsip-section" id="sectionArsip" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="judulArsipTabel" style="margin: 0; color: #2c3e50;">Hasil Data</h3>
+                <h3 id="judulArsipTabel" style="margin: 0; color: #1b4f72;">Hasil Data</h3>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="window.tutupArsipTabel()">Tutup Tampilan</button>
             </div>
             <div style="overflow-x: auto;">
@@ -299,7 +320,7 @@
     <!-- Modal Filter Tanggal -->
     <div id="modalExport" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin-top:0;">Filter Tanggal</h3>
+            <h3 id="modalTitle" style="margin-top:0; color:#1b4f72;">Filter Tanggal</h3>
             <p style="font-size: 12px; color: #666;">Silakan tentukan rentang tanggal untuk menampilkan atau mengunduh data.</p>
             
             <label for="filterMulai">Dari Tanggal:</label>
@@ -317,9 +338,9 @@
 
     <!-- Modal Konfirmasi Hapus Data Profesional -->
     <div id="modalKonfirmasiHapus" class="modal">
-        <div class="modal-content" style="width: 400px; text-align: center;">
-            <div style="font-size: 40px; color: #e74c3c; margin-bottom: 10px;">⚠️</div>
-            <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Konfirmasi Penghapusan</h3>
+        <div class="modal-content" style="width: 400px; text-align: center; border-top-color: #c0392b;">
+            <div style="font-size: 40px; color: #c0392b; margin-bottom: 10px;">⚠️</div>
+            <h3 style="margin: 0 0 10px 0; color: #1b4f72;">Konfirmasi Penghapusan</h3>
             <p style="font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 20px;">
                 Apakah Anda yakin ingin menghapus data ini dari sistem? Tindakan ini tidak dapat dibatalkan.
             </p>
@@ -375,30 +396,18 @@
         setInterval(updateJamRealtime, 1000);
         updateJamRealtime();
 
-        // Unlimited Kata Motivasi, Humor, Religi, Psikologi, Mentalitas (Ganti Tiap 1 Menit)
         const daftarMotivasi = [
             "💡 Motivasi: 'Kesuksesan besar adalah akumulasi dari ribuan hal kecil yang dilakukan dengan konsisten.'",
             "😂 Humor: 'Uang bukan segalanya, tapi kalau gak punya uang, segalanya jadi pusing.'",
             "🕌 Religi: 'Sesungguhnya bersama kesulitan itu ada kemudahan. (QS. Al-Insyirah: 6).'",
             "🧠 Psikologi: 'Terkadang bukan masalahnya yang berat, tapi cara pandang pikiran kitanya yang lelah.'",
-            "🛡️ Mentalitas: 'Jangan berharap hidup jadi lebih mudah, berharahlah agar dirimu menjadi lebih kuat.'",
-            "💡 Motivasi: 'Mimpi tidak akan menjadi kenyataan hanya karena diimpikan, tapi karena diperjuangkan.'",
-            "😂 Humor: 'Masa depanmu tergantung pada mimpimu, makanya tidurlah yang banyak!'",
-            "🕌 Religi: 'Jangan bersedih, Allah bersama orang-orang yang sabar dan terus berusaha.'",
-            "🧠 Psikologi: 'Self-care terbaik adalah berhenti memikirkan hal-hal yang berada di luar kendali kita.'",
-            "🛡️ Mentalitas: 'Kegagalan hanyalah kesempatan untuk memulai lagi dengan cara yang lebih cerdas.'",
-            "💡 Motivasi: 'Lakukan apa yang harus kamu lakukan hari ini agar esok hari kamu bisa menikmati hasilnya.'",
-            "😂 Humor: 'Motivator terbaik adalah dompet tipis di akhir bulan.'",
-            "🕌 Religi: 'Bersyukurlah atas hal-hal kecil, maka ketenangan jiwa akan menyertaimu.'",
-            "🧠 Psikologi: 'Pikiran negatif itu ibarat awan mendung; ia akan berlalu jika kita membiarkannya pergi.'",
-            "🛡️ Mentalitas: 'Disiplin adalah jembatan antara cita-cita dan pencapaian nyata.'"
+            "🛡️ Mentalitas: 'Jangan berharap hidup jadi lebih mudah, berharahlah agar dirimu menjadi lebih kuat.'"
         ];
 
         function putarKataMotivasiOtomatis() {
             const randomPesan = daftarMotivasi[Math.floor(Math.random() * daftarMotivasi.length)];
             const container = document.getElementById('notificationContainer');
             
-            // Hapus banner motivasi lama jika ada supaya tidak menumpuk
             const oldBanner = document.getElementById('bannerMotivasiOtomatis');
             if (oldBanner) oldBanner.remove();
 
@@ -412,7 +421,6 @@
             container.prepend(alertDiv);
         }
 
-        // Jalankan langsung pertama kali, lalu set per 1 menit (60000 ms)
         putarKataMotivasiOtomatis();
         setInterval(putarKataMotivasiOtomatis, 60000);
 
@@ -752,14 +760,27 @@
 
         function exportToPDF(data, mulai, sampai) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape');
+            const doc = new jsPDF('landscape', 'mm', 'a4');
 
+            // --- DESAIN PDF TEMA BIRU PROFESIONAL ---
+            const primaryColor = [27, 79, 114];   // #1b4f72 (Deep Blue)
+            const secondaryColor = [41, 128, 185]; // #2980b9 (Bright Blue)
+            const lightBgColor = [240, 244, 248];  // Soft Ice Blue
+            const darkTextColor = [44, 62, 80];
+
+            // Header Background Banner
+            doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.rect(0, 0, 297, 28, 'F');
+
+            // Header Title
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
             doc.setFontSize(16);
-            doc.text("Laporan Pendataan Sisa Pangan Dari Produksi", 14, 15);
+            doc.text("LAPORAN PENDATAAN SISA PANGAN DARI PRODUKSI", 14, 12);
             
+            doc.setFont('helvetica', 'normal');
             doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text(`Periode : ${mulai} s/d ${sampai}`, 14, 22);
+            doc.text(`Periode: ${mulai} s/d ${sampai}`, 14, 20);
 
             let tableRows = [];
             let grandTotal = 0;
@@ -769,32 +790,72 @@
                 tableRows.push([
                     idx + 1,
                     item.tanggal,
-                    `${item.karbo} Kg`,
-                    `${item.protein} Kg`,
-                    `${item.sayur} Kg`,
-                    `${item.buah} Kg`,
-                    `${item.total} Kg`,
-                    item.ket_karbo,
-                    item.ket_protein,
-                    item.ket_sayur,
-                    item.ket_buah
+                    item.karbo ? `${item.karbo} Kg` : '0 Kg',
+                    item.protein ? `${item.protein} Kg` : '0 Kg',
+                    item.sayur ? `${item.sayur} Kg` : '0 Kg',
+                    item.buah ? `${item.buah} Kg` : '0 Kg',
+                    item.total ? `${item.total} Kg` : '0.00 Kg',
+                    item.ket_karbo || '-',
+                    item.ket_protein || '-',
+                    item.ket_sayur || '-',
+                    item.ket_buah || '-'
                 ]);
                 grandTotal += numericTotal;
             });
 
             doc.autoTable({
-                startY: 28,
+                startY: 34,
                 head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
                 body: tableRows,
                 theme: 'grid',
-                headStyles: { fillColor: [44, 62, 80] },
+                headStyles: {
+                    fillColor: primaryColor,
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    fontSize: 10
+                },
+                bodyStyles: {
+                    textColor: darkTextColor,
+                    fontSize: 9,
+                    valign: 'middle'
+                },
+                alternateRowStyles: {
+                    fillColor: lightBgColor
+                },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 12 },
+                    1: { halign: 'center', cellWidth: 24 },
+                    2: { halign: 'center', cellWidth: 22 },
+                    3: { halign: 'center', cellWidth: 22 },
+                    4: { halign: 'center', cellWidth: 22 },
+                    5: { halign: 'center', cellWidth: 22 },
+                    6: { halign: 'center', cellWidth: 24, fontStyle: 'bold' },
+                    7: { cellWidth: 32 },
+                    8: { cellWidth: 32 },
+                    9: { cellWidth: 32 },
+                    10: { cellWidth: 31 }
+                },
                 foot: [['', 'Total Keseluruhan:', '', '', '', '', `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
-                footStyles: { fillColor: [238, 238, 238], textColor: [0, 0, 0], fontStyle: 'bold' }
+                footStyles: {
+                    fillColor: [214, 234, 248], // Very light blue tint
+                    textColor: primaryColor,
+                    fontStyle: 'bold',
+                    fontSize: 10
+                },
+                didDrawPage: function (data) {
+                    // Footer Page Number & Cetak Otomatis
+                    let pageCount = doc.internal.getNumberOfPages();
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(8);
+                    doc.setTextColor(120, 120, 120);
+                    doc.text(`Dicetak otomatis dari Sistem Pendataan Pangan | Halaman ${doc.internal.getCurrentPageInfo().pageNumber} dari ${pageCount}`, 14, 205);
+                }
             });
 
             let filename = `Laporan_Produksi_${mulai}_sd_${sampai}.pdf`;
             doc.save(filename);
-            window.tampilkanNotif('Laporan PDF berhasil diunduh.', 'success');
+            window.tampilkanNotif('Laporan PDF bertema biru profesional berhasil diunduh.', 'success');
         }
     </script>
 </body>
