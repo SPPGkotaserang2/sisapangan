@@ -214,6 +214,15 @@
             }
         }
 
+        function formatTanggalID(tanggalStr) {
+            if (!tanggalStr) return '';
+            const bagian = tanggalStr.split('-');
+            if (bagian.length === 3) {
+                return `${bagian[2]}/${bagian[1]}/${bagian[0]}`;
+            }
+            return tanggalStr;
+        }
+
         document.getElementById('formSisaMakanan').addEventListener('submit', async function(e) {
             e.preventDefault();
             const rows = document.querySelectorAll('#bodyTabel tr');
@@ -329,7 +338,7 @@
 
             renderDataRows(data);
             section.style.display = 'block';
-            document.getElementById('judulTabelData').innerText = `Hasil Data Periode: ${mulai} s/d ${sampai}`;
+            document.getElementById('judulTabelData').innerText = `Hasil Data Periode: ${formatTanggalID(mulai)} s/d ${formatTanggalID(sampai)}`;
             tampilkanNotif('Data dari Sistem berhasil dimuat.', 'success');
         }
 
@@ -458,16 +467,19 @@
         }
 
         function exportToExcel(data, mulai, sampai) {
+            const mulaiID = formatTanggalID(mulai);
+            const sampaiID = formatTanggalID(sampai);
+
             let wsData = [
                 ["LAPORAN PENDATAAN SISA MAKANAN PEMORSIAN"],
-                [`Periode: ${mulai} s/d ${sampai}`],
+                [`Periode: ${mulaiID} s/d ${sampaiID}`],
                 [],
                 ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
             ];
 
             data.forEach((item, idx) => {
                 wsData.push([
-                    idx + 1, item.tanggal, item.karbo, item.protein, item.sayur, item.buah, item.total,
+                    idx + 1, formatTanggalID(item.tanggal), item.karbo, item.protein, item.sayur, item.buah, item.total,
                     item.ket_karbo, item.ket_protein, item.ket_sayur, item.ket_buah
                 ]);
             });
@@ -485,6 +497,9 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape', 'mm', 'a4');
 
+            const mulaiID = formatTanggalID(mulai);
+            const sampaiID = formatTanggalID(sampai);
+
             // Header Kop Dokumen PDF
             doc.setFillColor(27, 79, 114); // #1b4f72 (Biru Tua Korporat)
             doc.rect(0, 0, 297, 24, 'F');
@@ -496,7 +511,7 @@
 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text(`Periode: ${mulai} s/d ${sampai}`, 14, 18);
+            doc.text(`Periode: ${mulaiID} s/d ${sampaiID}`, 14, 18);
 
             let tableRows = [];
             let grandTotal = 0;
@@ -505,7 +520,7 @@
                 let numericTotal = parseBerat(item.total) || parseFloat(item.total) || 0;
                 tableRows.push([
                     idx + 1, 
-                    item.tanggal, 
+                    formatTanggalID(item.tanggal), 
                     `${item.karbo} Kg`, 
                     `${item.protein} Kg`,
                     `${item.sayur} Kg`, 
@@ -519,7 +534,7 @@
                 grandTotal += numericTotal;
             });
 
-            // Pengaturan Tabel dengan jspdf-autotable (Lebar disesuaikan agar pas penuh)
+            // Pengaturan Tabel dengan jspdf-autotable (Footer menggunakan colSpan agar rapi dalam satu baris)
             doc.autoTable({
                 startY: 30,
                 head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
@@ -540,34 +555,27 @@
                     fillColor: [240, 244, 248] // Zebra Striping: #f0f4f8
                 },
                 columnStyles: {
-                    0: { cellWidth: 10, halign: 'center' }, // No
+                    0: { cellWidth: 15, halign: 'center' }, // No
                     1: { cellWidth: 22, halign: 'center' }, // Tanggal
                     2: { cellWidth: 16, halign: 'center' }, // Karbo
                     3: { cellWidth: 16, halign: 'center' }, // Protein
                     4: { cellWidth: 16, halign: 'center' }, // Sayur
                     5: { cellWidth: 16, halign: 'center' }, // Buah
-                    6: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }, // Total
-                    7: { cellWidth: 35 }, // Ket. Karbo
-                    8: { cellWidth: 35 }, // Ket. Protein
-                    9: { cellWidth: 35 }, // Ket. Sayur
-                    10: { cellWidth: 36 }  // Ket. Buah
+                    6: { cellWidth: 22, halign: 'center', fontStyle: 'bold' }, // Total
+                    7: { cellWidth: 33 }, // Ket. Karbo
+                    8: { cellWidth: 33 }, // Ket. Protein
+                    9: { cellWidth: 33 }, // Ket. Sayur
+                    10: { cellWidth: 34 }  // Ket. Buah
                 },
-                foot: [['', 'Total Keseluruhan:', '', '', '', '', `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
+                foot: [[
+                    { content: 'Total', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold' } }, 
+                    { content: `${grandTotal.toFixed(2)} Kg`, styles: { halign: 'center', fontStyle: 'bold' } }, 
+                    { content: '', colSpan: 4 }
+                ]],
                 footStyles: { 
                     fillColor: [238, 238, 238], 
                     textColor: [0, 0, 0], 
-                    fontStyle: 'bold',
                     fontSize: 9
-                },
-                didDrawPage: function (data) {
-                    // Footer Halaman Dinamis & Info Cetak Otomatis
-                    let str = 'Halaman ' + doc.internal.getNumberOfPages();
-                    doc.setFontSize(8);
-                    doc.setTextColor(100);
-                    
-                    let tanggalCetak = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' });
-                    doc.text(`Dicetak otomatis oleh Sistem pada: ${tanggalCetak}`, 14, doc.internal.pageSize.height - 10);
-                    doc.text(str, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 10, { align: 'right' });
                 }
             });
 
