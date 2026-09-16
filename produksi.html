@@ -18,7 +18,7 @@
             color: #2c3e50;
         }
         .container {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
             background: #ffffff;
             padding: 25px;
@@ -245,12 +245,12 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Karbo (Kg)</th>
+                            <th>Karbohidrat (Kg)</th>
                             <th>Protein (Kg)</th>
                             <th>Sayur (Kg)</th>
                             <th>Buah (Kg)</th>
                             <th>Total (Kg)</th>
-                            <th>Ket. Karbo</th>
+                            <th>Ket. Karbohidrat</th>
                             <th>Ket. Protein</th>
                             <th>Ket. Sayur</th>
                             <th>Ket. Buah</th>
@@ -297,12 +297,12 @@
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
-                            <th>Karbo (Kg)</th>
+                            <th>Karbohidrat (Kg)</th>
                             <th>Protein (Kg)</th>
                             <th>Sayur (Kg)</th>
                             <th>Buah (Kg)</th>
                             <th>Total (Kg)</th>
-                            <th>Ket. Karbo</th>
+                            <th>Ket. Karbohidrat</th>
                             <th>Ket. Protein</th>
                             <th>Ket. Sayur</th>
                             <th>Ket. Buah</th>
@@ -386,6 +386,16 @@
                 window.muatUlangTabelArsipAktif();
             }
         });
+
+        // Format tanggal dari YYYY-MM-DD ke DD/MM/YYYY
+        function formatTanggalID(tanggalStr) {
+            if (!tanggalStr) return '';
+            const parts = tanggalStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return tanggalStr;
+        }
 
         // Update Jam Real-Time & Hari
         function updateJamRealtime() {
@@ -615,7 +625,7 @@
 
             renderArsipRows(data);
             section.style.display = 'block';
-            document.getElementById('judulArsipTabel').innerText = `Hasil Data Periode : ${mulai} s/d ${sampai}`;
+            document.getElementById('judulArsipTabel').innerText = `Hasil Data Periode : ${formatTanggalID(mulai)} s/d ${formatTanggalID(sampai)}`;
             window.tampilkanNotif('Data berhasil dimuat ke tabel bawah.', 'success');
         }
 
@@ -735,16 +745,17 @@
         }
 
         function exportToExcel(data, mulai, sampai) {
+            let periodeStr = `${formatTanggalID(mulai)} s/d ${formatTanggalID(sampai)}`;
             let wsData = [
                 ["LAPORAN PENDATAAN SISA PANGAN DARI PRODUKSI"],
-                [`Periode : ${mulai} s/d ${sampai}`],
+                [`Periode : ${periodeStr}`],
                 [],
-                ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
+                ["No", "Tanggal", "Karbohidrat (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbohidrat", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
             ];
 
             data.forEach((item, idx) => {
                 wsData.push([
-                    idx + 1, item.tanggal, item.karbo, item.protein, item.sayur, item.buah, item.total,
+                    idx + 1, formatTanggalID(item.tanggal), item.karbo, item.protein, item.sayur, item.buah, item.total,
                     item.ket_karbo, item.ket_protein, item.ket_sayur, item.ket_buah
                 ]);
             });
@@ -768,6 +779,8 @@
             const lightBgColor = [240, 244, 248];  // Soft Ice Blue
             const darkTextColor = [44, 62, 80];
 
+            let periodeStr = `${formatTanggalID(mulai)} s/d ${formatTanggalID(sampai)}`;
+
             // Header Background Banner
             doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
             doc.rect(0, 0, 297, 28, 'F');
@@ -780,7 +793,7 @@
             
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(10);
-            doc.text(`Periode: ${mulai} s/d ${sampai}`, 14, 20);
+            doc.text(`Periode: ${periodeStr}`, 14, 20);
 
             let tableRows = [];
             let grandTotal = 0;
@@ -789,7 +802,7 @@
                 let numericTotal = parseBerat(item.total) || parseFloat(item.total) || 0;
                 tableRows.push([
                     idx + 1,
-                    item.tanggal,
+                    formatTanggalID(item.tanggal),
                     item.karbo ? `${item.karbo} Kg` : '0 Kg',
                     item.protein ? `${item.protein} Kg` : '0 Kg',
                     item.sayur ? `${item.sayur} Kg` : '0 Kg',
@@ -805,7 +818,7 @@
 
             doc.autoTable({
                 startY: 34,
-                head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
+                head: [['No', 'Tanggal', 'Karbohidrat', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbohidrat', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
                 body: tableRows,
                 theme: 'grid',
                 headStyles: {
@@ -826,30 +839,26 @@
                 columnStyles: {
                     0: { halign: 'center', cellWidth: 12 },
                     1: { halign: 'center', cellWidth: 24 },
-                    2: { halign: 'center', cellWidth: 22 },
+                    2: { halign: 'center', cellWidth: 24 },
                     3: { halign: 'center', cellWidth: 22 },
                     4: { halign: 'center', cellWidth: 22 },
                     5: { halign: 'center', cellWidth: 22 },
                     6: { halign: 'center', cellWidth: 24, fontStyle: 'bold' },
-                    7: { cellWidth: 32 },
-                    8: { cellWidth: 32 },
-                    9: { cellWidth: 32 },
+                    7: { cellWidth: 31 },
+                    8: { cellWidth: 31 },
+                    9: { cellWidth: 31 },
                     10: { cellWidth: 31 }
                 },
-                foot: [['', 'Total Keseluruhan:', '', '', '', '', `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
+                foot: [[
+                    { content: 'Total Keseluruhan :', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold' } },
+                    { content: `${grandTotal.toFixed(2)} Kg`, styles: { halign: 'center', fontStyle: 'bold' } },
+                    { content: '', colSpan: 4 }
+                ]],
                 footStyles: {
                     fillColor: [214, 234, 248], // Very light blue tint
                     textColor: primaryColor,
                     fontStyle: 'bold',
                     fontSize: 10
-                },
-                didDrawPage: function (data) {
-                    // Footer Page Number & Cetak Otomatis
-                    let pageCount = doc.internal.getNumberOfPages();
-                    doc.setFont('helvetica', 'italic');
-                    doc.setFontSize(8);
-                    doc.setTextColor(120, 120, 120);
-                    doc.text(`Dicetak otomatis dari Sistem Pendataan Pangan | Halaman ${doc.internal.getCurrentPageInfo().pageNumber} dari ${pageCount}`, 14, 205);
                 }
             });
 
