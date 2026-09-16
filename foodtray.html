@@ -691,7 +691,7 @@
 
             renderArsipRows(data);
             section.style.display = 'block';
-            document.getElementById('judulArsipTabel').innerText = `Hasil Data Sistem Periode: ${mulai} s/d ${sampai}`;
+            document.getElementById('judulArsipTabel').innerText = `Hasil Data Sistem Periode : ${mulai} s/d ${sampai}`;
             tampilkanNotif('Data dari Sistem berhasil dimuat ke tabel bawah.', 'success');
         }
 
@@ -824,7 +824,7 @@
         window.exportToExcel = function(data, mulai, sampai) {
             let wsData = [
                 ["LAPORAN PENDATAAN SISA MAKANAN DARI FOODTRAY ( SISTEM )"],
-                [`Periode: ${mulai} s/d ${sampai}`],
+                [`Periode : ${mulai} s/d ${sampai}`],
                 [],
                 ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
             ];
@@ -854,7 +854,7 @@
             
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text(`Periode: ${mulai} s/d ${sampai}`, 14, 22);
+            doc.text(`Periode : ${mulai} s/d ${sampai}`, 14, 22);
 
             let tableRows = [];
             let grandTotal = 0;
