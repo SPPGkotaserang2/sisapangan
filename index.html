@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Input Sisa Pangan</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Cek apakah user sudah login
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <div class="logo-wrapper">
+            <img src="logo.png" alt="Logo Instansi" style="max-width: 80px; border-radius: 50%;" onerror="this.style.display='none'">
+        </div>
+        <h1>Sistem Pencatatan Sisa Pangan</h1>
+        <p style="color: #666; margin-bottom: 25px;">Silakan pilih kategori menu input data di bawah ini:</p>
+        
+        <div class="menu-list" style="text-align: left;">
+            <a href="produksi.html" class="menu-btn">1. Sisa Pangan Produksi</a>
+            <a href="pemorsian.html" class="menu-btn">2. Sisa Pangan Pemorsian</a>
+            <a href="foodtray.html" class="menu-btn">3. Sisa Pangan Foodtray</a>
+        </div>
+
+        <button onclick="logout()" class="btn-logout">Keluar (Logout)</button>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

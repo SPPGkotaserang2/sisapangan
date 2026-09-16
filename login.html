@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Sisa Pangan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-wrapper">
+            <!-- Ganti 'logo.png' dengan nama file logo lokal Anda -->
+            <img src="logo.png" alt="Logo Instansi" onerror="this.style.display='none'">
+        </div>
+        <h2>INPUT DATA SISA PANGAN</h2>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" placeholder="Masukkan username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Kata Sandi:</label>
+                <input type="password" id="password" placeholder="Masukkan kata sandi" required>
+            </div>
+            
+            <div id="errorMsg" class="error-msg">Username atau kata sandi salah!</div>
+            
+            <button type="submit" class="btn-login">Masuk</button>
+        </form>
+    </div>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Kredensial sesuai permintaan: Username: Serang, Sandi: Mandiri02srg
+            if (user === 'Serang' && pass === 'Mandiri02srg') {
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = 'index.html';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

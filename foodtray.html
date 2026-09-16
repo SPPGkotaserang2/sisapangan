@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendataan Sisa Makanan - Foodtray</title>
+    <!-- Pustaka Eksternal untuk Excel & PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-primary { background-color: #3498db; color: white; }
+        .btn-success { background-color: #2ecc71; color: white; }
+        .btn-danger { background-color: #e74c3c; color: white; }
+        .btn-secondary { background-color: #95a5a6; color: white; }
+        .btn-warning { background-color: #f39c12; color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 12px; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        input[type="date"], input[type="text"] {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[readonly] {
+            background-color: #e9ecef;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .arsip-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #ccc;
+        }
+        /* Notifikasi Banner */
+        #notificationContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .alert-banner {
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 250px;
+        }
+        .alert-success { background-color: #2ecc71; }
+        .alert-danger { background-color: #e74c3c; }
+        .alert-info { background-color: #3498db; }
+        .close-alert {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .modal-content input {
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kontainer Notifikasi -->
+    <div id="notificationContainer"></div>
+
+    <div class="container">
+        <!-- Header dengan Tombol Kembali -->
+        <div class="header-flex">
+            <a href="index.html" class="btn btn-secondary">&#8592; Kembali</a>
+            <h2>Pendataan Sisa Makanan - Foodtray</h2>
+        </div>
+        
+        <!-- Form Input Utama -->
+        <form id="formSisaMakanan">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Karbo (Kg)</th>
+                            <th>Protein (Kg)</th>
+                            <th>Sayur (Kg)</th>
+                            <th>Buah (Kg)</th>
+                            <th>Total (Kg)</th>
+                            <th>Ket. Karbo</th>
+                            <th>Ket. Protein</th>
+                            <th>Ket. Sayur</th>
+                            <th>Ket. Buah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabel">
+                        <tr>
+                            <td class="nomor">1</td>
+                            <td><input type="date" name="tanggal[]" class="tanggal-input" required></td>
+                            <td><input type="text" name="karbo[]" class="berat karbo" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                            <td><input type="text" name="protein[]" class="berat protein" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                            <td><input type="text" name="sayur[]" class="berat sayur" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                            <td><input type="text" name="buah[]" class="berat buah" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                            <td><input type="text" name="total[]" class="total" readonly value="0.00"></td>
+                            <td><input type="text" name="ket_karbo[]" placeholder="Keterangan..."></td>
+                            <td><input type="text" name="ket_protein[]" placeholder="Keterangan..."></td>
+                            <td><input type="text" name="ket_sayur[]" placeholder="Keterangan..."></td>
+                            <td><input type="text" name="ket_buah[]" placeholder="Keterangan..."></td>
+                            <td><button type="button" class="btn btn-danger" onclick="hapusBaris(this)">Hapus</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-primary" onclick="tambahBaris()">+ Tambah Baris</button>
+                <button type="submit" class="btn btn-success">Simpan ke Arsip</button>
+                <button type="button" class="btn btn-warning" onclick="bukaModalExport('lihat')">🔍 Lihat Arsip</button>
+                <button type="button" class="btn btn-secondary" onclick="bukaModalExport('excel')">📥 Unduh Excel</button>
+                <button type="button" class="btn btn-danger" onclick="bukaModalExport('pdf')">📥 Unduh PDF</button>
+            </div>
+        </form>
+
+        <!-- Bagian Tampilan Arsip Berdasarkan Tanggal -->
+        <div class="arsip-section" id="sectionArsip" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="judulArsipTabel" style="margin: 0; color: #2c3e50;">Hasil Arsip</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="tutupArsipTabel()">Tutup Tampilan</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Karbo (Kg)</th>
+                            <th>Protein (Kg)</th>
+                            <th>Sayur (Kg)</th>
+                            <th>Buah (Kg)</th>
+                            <th>Total (Kg)</th>
+                            <th>Ket. Karbo</th>
+                            <th>Ket. Protein</th>
+                            <th>Ket. Sayur</th>
+                            <th>Ket. Buah</th>
+                            <th>Aksi Arsip</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabelArsip">
+                        <!-- Data arsip akan dimuat di sini -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Filter Tanggal -->
+    <div id="modalExport" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin-top:0;">Filter Tanggal</h3>
+            <p style="font-size: 12px; color: #666;">Silakan tentukan rentang tanggal untuk menampilkan atau mengunduh arsip data.</p>
+            
+            <label for="filterMulai">Dari Tanggal:</label>
+            <input type="date" id="filterMulai">
+            
+            <label for="filterSampai">Sampai Tanggal:</label>
+            <input type="date" id="filterSampai">
+            
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" onclick="tutupModalExport()">Batal</button>
+                <button type="button" class="btn btn-success" onclick="prosesAksiModal()">Terapkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skrip JavaScript -->
+    <script>
+        let modeAksi = '';
+        let storageKey = 'arsipSisaMakanan_foodtray';
+        let dataArsip = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const defaultDateInput = document.querySelector('.tanggal-input');
+            if (defaultDateInput) {
+                defaultDateInput.valueAsDate = new Date();
+            }
+        });
+
+        function tampilkanNotif(pesan, tipe = 'success') {
+            const container = document.getElementById('notificationContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-banner alert-${tipe}`;
+            alertDiv.innerHTML = `
+                <span>${pesan}</span>
+                <button class="close-alert" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 4000);
+        }
+
+        function parseBerat(valStr) {
+            if (!valStr) return 0;
+            try {
+                let cleanStr = valStr.toString().replace(/[^0-9.+\s]/g, '');
+                if (!cleanStr) return 0;
+                let parts = cleanStr.split('+');
+                let sum = parts.reduce((acc, curr) => acc + (parseFloat(curr) || 0), 0);
+                return sum;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function tambahBaris() {
+            const tbody = document.getElementById('bodyTabel');
+            const rowCount = tbody.rows.length + 1;
+            
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="nomor">${rowCount}</td>
+                <td><input type="date" name="tanggal[]" class="tanggal-input" required></td>
+                <td><input type="text" name="karbo[]" class="berat karbo" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                <td><input type="text" name="protein[]" class="berat protein" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                <td><input type="text" name="sayur[]" class="berat sayur" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                <td><input type="text" name="buah[]" class="berat buah" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                <td><input type="text" name="total[]" class="total" readonly value="0.00"></td>
+                <td><input type="text" name="ket_karbo[]" placeholder="Keterangan..."></td>
+                <td><input type="text" name="ket_protein[]" placeholder="Keterangan..."></td>
+                <td><input type="text" name="ket_sayur[]" placeholder="Keterangan..."></td>
+                <td><input type="text" name="ket_buah[]" placeholder="Keterangan..."></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">Hapus</button></td>
+            `;
+            tbody.appendChild(newRow);
+            newRow.querySelector('.tanggal-input').valueAsDate = new Date();
+            perbaruiNomor();
+        }
+
+        function hapusBaris(button) {
+            const row = button.closest('tr');
+            const tbody = document.getElementById('bodyTabel');
+            if (tbody.rows.length > 1) {
+                row.remove();
+                perbaruiNomor();
+                tampilkanNotif('Baris berhasil dihapus dari form.', 'info');
+            } else {
+                tampilkanNotif('Minimal harus menyisakan 1 baris data.', 'danger');
+            }
+        }
+
+        function perbaruiNomor() {
+            const rows = document.querySelectorAll('#bodyTabel tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.nomor').innerText = index + 1;
+            });
+        }
+
+        function hitungTotal(element) {
+            const row = element.closest('tr');
+            const karboVal = parseBerat(row.querySelector('.karbo').value);
+            const proteinVal = parseBerat(row.querySelector('.protein').value);
+            const sayurVal = parseBerat(row.querySelector('.sayur').value);
+            const buahVal = parseBerat(row.querySelector('.buah').value);
+
+            const total = karboVal + proteinVal + sayurVal + buahVal;
+            row.querySelector('.total').value = total.toFixed(2);
+        }
+
+        document.getElementById('formSisaMakanan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const rows = document.querySelectorAll('#bodyTabel tr');
+            
+            rows.forEach(row => {
+                const tanggal = row.querySelector('.tanggal-input').value;
+                const karbo = row.querySelector('.karbo').value || '0';
+                const protein = row.querySelector('.protein').value || '0';
+                const sayur = row.querySelector('.sayur').value || '0';
+                const buah = row.querySelector('.buah').value || '0';
+                const total = row.querySelector('.total').value || '0.00';
+                const ket_karbo = row.querySelector('input[name="ket_karbo[]"]').value || '-';
+                const ket_protein = row.querySelector('input[name="ket_protein[]"]').value || '-';
+                const ket_sayur = row.querySelector('input[name="ket_sayur[]"]').value || '-';
+                const ket_buah = row.querySelector('input[name="ket_buah[]"]').value || '-';
+
+                dataArsip.push({
+                    id: Date.now() + Math.random(),
+                    tanggal, karbo, protein, sayur, buah, total,
+                    ket_karbo, ket_protein, ket_sayur, ket_buah
+                });
+            });
+
+            localStorage.setItem(storageKey, JSON.stringify(dataArsip));
+            tampilkanNotif('Data sisa makanan berhasil disimpan ke arsip!', 'success');
+            
+            document.getElementById('bodyTabel').innerHTML = `
+                <tr>
+                    <td class="nomor">1</td>
+                    <td><input type="date" name="tanggal[]" class="tanggal-input" required></td>
+                    <td><input type="text" name="karbo[]" class="berat karbo" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                    <td><input type="text" name="protein[]" class="berat protein" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                    <td><input type="text" name="sayur[]" class="berat sayur" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                    <td><input type="text" name="buah[]" class="berat buah" placeholder="0.00 atau 1+2" oninput="hitungTotal(this)" required></td>
+                    <td><input type="text" name="total[]" class="total" readonly value="0.00"></td>
+                    <td><input type="text" name="ket_karbo[]" placeholder="Keterangan..."></td>
+                    <td><input type="text" name="ket_protein[]" placeholder="Keterangan..."></td>
+                    <td><input type="text" name="ket_sayur[]" placeholder="Keterangan..."></td>
+                    <td><input type="text" name="ket_buah[]" placeholder="Keterangan..."></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)">Hapus</button></td>
+                </tr>
+            `;
+            document.querySelector('.tanggal-input').valueAsDate = new Date();
+            
+            // Jika tabel arsip sedang terbuka, perbarui tampilannya
+            if(document.getElementById('sectionArsip').style.display === 'block') {
+                muatUlangTabelArsipAktif();
+            }
+        });
+
+        function bukaModalExport(jenis) {
+            modeAksi = jenis;
+            let judul = 'Filter Tanggal';
+            if (jenis === 'lihat') judul = 'Lihat Arsip Berdasarkan Tanggal';
+            else if (jenis === 'excel') judul = 'Ekspor Data ke Excel';
+            else if (jenis === 'pdf') judul = 'Ekspor Data ke PDF';
+
+            document.getElementById('modalTitle').innerText = judul;
+            document.getElementById('modalExport').style.display = 'flex';
+        }
+
+        function tutupModalExport() {
+            document.getElementById('modalExport').style.display = 'none';
+        }
+
+        function tutupArsipTabel() {
+            document.getElementById('sectionArsip').style.display = 'none';
+        }
+
+        function prosesAksiModal() {
+            const mulai = document.getElementById('filterMulai').value;
+            const sampai = document.getElementById('filterSampai').value;
+            
+            if (!mulai && !sampai) {
+                tampilkanNotif('Silakan pilih rentang tanggal (Dari Tanggal / Sampai Tanggal) terlebih dahulu!', 'danger');
+                return;
+            }
+
+            let data = dataArsip;
+            if (mulai) data = data.filter(item => item.tanggal >= mulai);
+            if (sampai) data = data.filter(item => item.tanggal <= sampai);
+
+            if (data.length === 0) {
+                tampilkanNotif('Tidak ada data arsip dalam rentang tanggal tersebut!', 'danger');
+                return;
+            }
+
+            if (modeAksi === 'lihat') {
+                tampilkanTabelArsip(data, mulai, sampai);
+            } else if (modeAksi === 'excel') {
+                exportToExcel(data, mulai, sampai);
+            } else if (modeAksi === 'pdf') {
+                exportToPDF(data, mulai, sampai);
+            }
+
+            tutupModalExport();
+        }
+
+        function tampilkanTabelArsip(data, mulai, sampai) {
+            // Simpan filter aktif ke atribut elemen untuk keperluan refresh saat edit/hapus
+            const section = document.getElementById('sectionArsip');
+            section.setAttribute('data-mulai', mulai);
+            section.setAttribute('data-sampai', sampai);
+
+            renderArsipRows(data);
+            section.style.display = 'block';
+            document.getElementById('judulArsipTabel').innerText = `Hasil Arsip Periode: ${mulai} s/d ${sampai}`;
+            tampilkanNotif('Arsip berhasil dimuat ke tabel bawah.', 'success');
+        }
+
+        function renderArsipRows(data) {
+            const tbodyArsip = document.getElementById('bodyTabelArsip');
+            tbodyArsip.innerHTML = '';
+
+            data.forEach((item, idx) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td><input type="date" value="${item.tanggal}" id="edit_tgl_${item.id}" disabled></td>
+                    <td><input type="text" value="${item.karbo}" id="edit_karbo_${item.id}" oninput="hitungTotalArsip('${item.id}')" disabled></td>
+                    <td><input type="text" value="${item.protein}" id="edit_protein_${item.id}" oninput="hitungTotalArsip('${item.id}')" disabled></td>
+                    <td><input type="text" value="${item.sayur}" id="edit_sayur_${item.id}" oninput="hitungTotalArsip('${item.id}')" disabled></td>
+                    <td><input type="text" value="${item.buah}" id="edit_buah_${item.id}" oninput="hitungTotalArsip('${item.id}')" disabled></td>
+                    <td><input type="text" value="${item.total}" id="edit_total_${item.id}" readonly></td>
+                    <td><input type="text" value="${item.ket_karbo}" id="edit_ket_karbo_${item.id}" disabled></td>
+                    <td><input type="text" value="${item.ket_protein}" id="edit_ket_protein_${item.id}" disabled></td>
+                    <td><input type="text" value="${item.ket_sayur}" id="edit_ket_sayur_${item.id}" disabled></td>
+                    <td><input type="text" value="${item.ket_buah}" id="edit_ket_buah_${item.id}" disabled></td>
+                    <td>
+                        <div id="action_btn_${item.id}" style="display: flex; gap: 5px; justify-content: center;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="aktifkanEditArsip('${item.id}')">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="hapusArsipItem('${item.id}')">Hapus</button>
+                        </div>
+                    </td>
+                `;
+                tbodyArsip.appendChild(tr);
+            });
+        }
+
+        function aktifkanEditArsip(id) {
+            // Aktifkan input pada baris tersebut
+            document.getElementById(`edit_tgl_${id}`).disabled = false;
+            document.getElementById(`edit_karbo_${id}`).disabled = false;
+            document.getElementById(`edit_protein_${id}`).disabled = false;
+            document.getElementById(`edit_sayur_${id}`).disabled = false;
+            document.getElementById(`edit_buah_${id}`).disabled = false;
+            document.getElementById(`edit_ket_karbo_${id}`).disabled = false;
+            document.getElementById(`edit_ket_protein_${id}`).disabled = false;
+            document.getElementById(`edit_ket_sayur_${id}`).disabled = false;
+            document.getElementById(`edit_ket_buah_${id}`).disabled = false;
+
+            // Ganti tombol Edit menjadi Simpan
+            const actionDiv = document.getElementById(`action_btn_${id}`);
+            actionDiv.innerHTML = `
+                <button type="button" class="btn btn-success btn-sm" onclick="simpanEditArsip('${id}')">Simpan</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="muatUlangTabelArsipAktif()">Batal</button>
+            `;
+        }
+
+        function hitungTotalArsip(id) {
+            const karbo = parseBerat(document.getElementById(`edit_karbo_${id}`).value);
+            const protein = parseBerat(document.getElementById(`edit_protein_${id}`).value);
+            const sayur = parseBerat(document.getElementById(`edit_sayur_${id}`).value);
+            const buah = parseBerat(document.getElementById(`edit_buah_${id}`).value);
+            const total = karbo + protein + sayur + buah;
+            document.getElementById(`edit_total_${id}`).value = total.toFixed(2);
+        }
+
+        function simpanEditArsip(id) {
+            const index = dataArsip.findIndex(item => item.id == id);
+            if (index !== -1) {
+                dataArsip[index].tanggal = document.getElementById(`edit_tgl_${id}`).value;
+                dataArsip[index].karbo = document.getElementById(`edit_karbo_${id}`).value || '0';
+                dataArsip[index].protein = document.getElementById(`edit_protein_${id}`).value || '0';
+                dataArsip[index].sayur = document.getElementById(`edit_sayur_${id}`).value || '0';
+                dataArsip[index].buah = document.getElementById(`edit_buah_${id}`).value || '0';
+                dataArsip[index].total = document.getElementById(`edit_total_${id}`).value || '0.00';
+                dataArsip[index].ket_karbo = document.getElementById(`edit_ket_karbo_${id}`).value || '-';
+                dataArsip[index].ket_protein = document.getElementById(`edit_ket_protein_${id}`).value || '-';
+                dataArsip[index].ket_sayur = document.getElementById(`edit_ket_sayur_${id}`).value || '-';
+                dataArsip[index].ket_buah = document.getElementById(`edit_ket_buah_${id}`).value || '-';
+
+                localStorage.setItem(storageKey, JSON.stringify(dataArsip));
+                tampilkanNotif('Data arsip berhasil diperbarui!', 'success');
+                muatUlangTabelArsipAktif();
+            }
+        }
+
+        function hapusArsipItem(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data arsip ini?')) {
+                dataArsip = dataArsip.filter(item => item.id != id);
+                localStorage.setItem(storageKey, JSON.stringify(dataArsip));
+                tampilkanNotif('Data arsip berhasil dihapus.', 'info');
+                muatUlangTabelArsipAktif();
+            }
+        }
+
+        function muatUlangTabelArsipAktif() {
+            const section = document.getElementById('sectionArsip');
+            const mulai = section.getAttribute('data-mulai');
+            const sampai = section.getAttribute('data-sampai');
+
+            let data = dataArsip;
+            if (mulai) data = data.filter(item => item.tanggal >= mulai);
+            if (sampai) data = data.filter(item => item.tanggal <= sampai);
+
+            if (data.length === 0) {
+                document.getElementById('sectionArsip').style.display = 'none';
+            } else {
+                renderArsipRows(data);
+            }
+        }
+
+        function exportToExcel(data, mulai, sampai) {
+            let wsData = [
+                ["LAPORAN PENDATAAN SISA MAKANAN DARI FOODTRAY"],
+                [`Periode: ${mulai} s/d ${sampai}`],
+                [],
+                ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
+            ];
+
+            data.forEach((item, idx) => {
+                wsData.push([
+                    idx + 1, item.tanggal, item.karbo, item.protein, item.sayur, item.buah, item.total,
+                    item.ket_karbo, item.ket_protein, item.ket_sayur, item.ket_buah
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Sisa Makanan");
+            
+            let filename = `Laporan_Foodtray_${mulai}_sd_${sampai}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            tampilkanNotif('Laporan Excel berhasil diunduh.', 'success');
+        }
+
+        function exportToPDF(data, mulai, sampai) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+
+            doc.setFontSize(16);
+            doc.text("Laporan Pendataan Sisa Makanan Dari Foodtray", 14, 15);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Periode: ${mulai} s/d ${sampai}`, 14, 22);
+
+            let tableRows = [];
+            let grandTotal = 0;
+
+            data.forEach((item, idx) => {
+                let numericTotal = parseBerat(item.total) || parseFloat(item.total) || 0;
+                tableRows.push([
+                    idx + 1,
+                    item.tanggal,
+                    `${item.karbo} Kg`,
+                    `${item.protein} Kg`,
+                    `${item.sayur} Kg`,
+                    `${item.buah} Kg`,
+                    `${item.total} Kg`,
+                    item.ket_karbo,
+                    item.ket_protein,
+                    item.ket_sayur,
+                    item.ket_buah
+                ]);
+                grandTotal += numericTotal;
+            });
+
+            doc.autoTable({
+                startY: 28,
+                head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
+                body: tableRows,
+                theme: 'grid',
+                headStyles: { fillColor: [44, 62, 80] },
+                foot: [['', 'Total Keseluruhan:', '', '', '', '', `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
+                footStyles: { fillColor: [238, 238, 238], textColor: [0, 0, 0], fontStyle: 'bold' }
+            });
+
+            let filename = `Laporan_Foodtray_${mulai}_sd_${sampai}.pdf`;
+            doc.save(filename);
+            tampilkanNotif('Laporan PDF berhasil diunduh.', 'success');
+        }
+    </script>
+</body>
+</html>
