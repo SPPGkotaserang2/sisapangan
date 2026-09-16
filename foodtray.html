@@ -27,7 +27,7 @@
         }
         /* Widget Jadwal Sholat & Waktu */
         .sholat-banner {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: linear-gradient(135deg, #1b4f72, #2980b9);
             color: white;
             padding: 12px 18px;
             border-radius: 6px;
@@ -66,7 +66,7 @@
 
         /* Banner Kutipan Dinamis (Motivasi, Humor, Religi, Psikologi) */
         .quote-banner {
-            background: linear-gradient(135deg, #8e44ad, #3498db);
+            background: linear-gradient(135deg, #1b4f72, #2980b9);
             color: white;
             padding: 12px 18px;
             border-radius: 6px;
@@ -103,7 +103,7 @@
         }
         h2 {
             margin: 0;
-            color: #2c3e50;
+            color: #1b4f72;
         }
         .btn {
             padding: 8px 12px;
@@ -115,11 +115,11 @@
             display: inline-block;
             font-size: 14px;
         }
-        .btn-primary { background-color: #3498db; color: white; }
-        .btn-success { background-color: #2ecc71; color: white; }
-        .btn-danger { background-color: #e74c3c; color: white; }
-        .btn-secondary { background-color: #95a5a6; color: white; }
-        .btn-warning { background-color: #f39c12; color: white; }
+        .btn-primary { background-color: #2980b9; color: white; }
+        .btn-success { background-color: #27ae60; color: white; }
+        .btn-danger { background-color: #c0392b; color: white; }
+        .btn-secondary { background-color: #7f8c8d; color: white; }
+        .btn-warning { background-color: #d35400; color: white; }
         .btn-sm { padding: 4px 8px; font-size: 12px; }
         
         table {
@@ -137,7 +137,7 @@
             font-size: 14px;
         }
         th {
-            background-color: #2c3e50;
+            background-color: #1b4f72;
             color: white;
         }
         input[type="date"], input[type="text"] {
@@ -323,7 +323,7 @@
         <!-- Bagian Tampilan Data Berdasarkan Tanggal -->
         <div class="arsip-section" id="sectionArsip" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="judulArsipTabel" style="margin: 0; color: #2c3e50;">Hasil Data Sistem</h3>
+                <h3 id="judulArsipTabel" style="margin: 0; color: #1b4f72;">Hasil Data Sistem</h3>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="tutupArsipTabel()">Tutup Tampilan</button>
             </div>
             <div style="overflow-x: auto;">
@@ -421,7 +421,7 @@
 
         function gantiKutipanDinamis() {
             const banner = document.getElementById('quoteBannerContainer');
-            banner.style.opacity = 0; // Efek transisi pudar
+            banner.style.opacity = 0; 
 
             setTimeout(() => {
                 const acak = daftarKutipan[Math.floor(Math.random() * daftarKutipan.length)];
@@ -431,7 +431,6 @@
             }, 500);
         }
 
-        // Fungsi Memuat Jam Realtime & Jadwal Sholat Kota Serang
         function perbaruiWaktuDanSholat() {
             const sekarang = new Date();
             const opsiHari = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -466,14 +465,10 @@
             ambilDataFirebase();
             perbaruiWaktuDanSholat();
             
-            // Interval waktu jam & sholat (tiap 1 detik)
             setInterval(perbaruiWaktuDanSholat, 1000); 
-
-            // Interval kutipan dinamis berganti tiap 1 Menit (60.000 ms)
             setInterval(gantiKutipanDinamis, 60000);
         });
 
-        // Fungsi Notifikasi Popup Sementara
         window.tampilkanNotif = function(pesan, tipe = 'success', customHtml = '') {
             const notifEl = document.getElementById('appNotification');
             const notifText = document.getElementById('notifText');
@@ -570,7 +565,6 @@
             row.querySelector('.total').value = total.toFixed(2);
         }
 
-        // Simpan Data ke Sistem Database
         document.getElementById('formSisaMakanan').addEventListener('submit', function(e) {
             e.preventDefault();
             const rows = document.querySelectorAll('#bodyTabel tr');
@@ -691,7 +685,7 @@
 
             renderArsipRows(data);
             section.style.display = 'block';
-            document.getElementById('judulArsipTabel').innerText = `Hasil Data Sistem Periode : ${mulai} s/d ${sampai}`;
+            document.getElementById('judulArsipTabel').innerText = `Hasil Data Sistem Periode: ${formatTanggalID(mulai)} s/d ${formatTanggalID(sampai)}`;
             tampilkanNotif('Data dari Sistem berhasil dimuat ke tabel bawah.', 'success');
         }
 
@@ -821,17 +815,29 @@
             });
         }
 
+        window.formatTanggalID = function(tglStr) {
+            if (!tglStr) return '';
+            const bagian = tglStr.split('-');
+            if (bagian.length === 3) {
+                return `${bagian[2]}/${bagian[1]}/${bagian[0]}`;
+            }
+            return tglStr;
+        }
+
         window.exportToExcel = function(data, mulai, sampai) {
+            let mulaiFormatted = formatTanggalID(mulai);
+            let sampaiFormatted = formatTanggalID(sampai);
+
             let wsData = [
-                ["LAPORAN PENDATAAN SISA MAKANAN DARI FOODTRAY ( SISTEM )"],
-                [`Periode : ${mulai} s/d ${sampai}`],
+                ["LAPORAN PENDATAAN SISA MAKANAN DARI FOODTRAY"],
+                [`Periode: ${mulaiFormatted} s/d ${sampaiFormatted}`],
                 [],
                 ["No", "Tanggal", "Karbo (Kg)", "Protein (Kg)", "Sayur (Kg)", "Buah (Kg)", "Total (Kg)", "Ket. Karbo", "Ket. Protein", "Ket. Sayur", "Ket. Buah"]
             ];
 
             data.forEach((item, idx) => {
                 wsData.push([
-                    idx + 1, item.tanggal, item.karbo, item.protein, item.sayur, item.buah, item.total,
+                    idx + 1, formatTanggalID(item.tanggal), item.karbo, item.protein, item.sayur, item.buah, item.total,
                     item.ket_karbo, item.ket_protein, item.ket_sayur, item.ket_buah
                 ]);
             });
@@ -849,12 +855,20 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape');
 
+            let mulaiFormatted = formatTanggalID(mulai);
+            let sampaiFormatted = formatTanggalID(sampai);
+
+            // Kop Laporan Berkelir Biru Solid (Tanpa teks sistem di dalam kurung)
+            doc.setFillColor(27, 79, 114); // #1b4f72
+            doc.rect(0, 0, doc.internal.pageSize.getWidth(), 25, 'F');
+
             doc.setFontSize(16);
-            doc.text("Laporan Pendataan Sisa Makanan Dari Foodtray ( Sistem )", 14, 15);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Laporan Pendataan Sisa Makanan Dari Foodtray", 14, 12);
             
             doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text(`Periode : ${mulai} s/d ${sampai}`, 14, 22);
+            doc.setTextColor(220, 230, 242);
+            doc.text(`Periode: ${mulaiFormatted} s/d ${sampaiFormatted}`, 14, 19);
 
             let tableRows = [];
             let grandTotal = 0;
@@ -863,7 +877,7 @@
                 let numericTotal = parseBerat(item.total) || parseFloat(item.total) || 0;
                 tableRows.push([
                     idx + 1,
-                    item.tanggal,
+                    formatTanggalID(item.tanggal),
                     `${item.karbo} Kg`,
                     `${item.protein} Kg`,
                     `${item.sayur} Kg`,
@@ -878,13 +892,44 @@
             });
 
             doc.autoTable({
-                startY: 28,
+                startY: 32,
                 head: [['No', 'Tanggal', 'Karbo', 'Protein', 'Sayur', 'Buah', 'Total', 'Ket. Karbo', 'Ket. Protein', 'Ket. Sayur', 'Ket. Buah']],
                 body: tableRows,
                 theme: 'grid',
-                headStyles: { fillColor: [44, 62, 80] },
-                foot: [['', 'Total Keseluruhan:', '', '', '', '', `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
-                footStyles: { fillColor: [238, 238, 238], textColor: [0, 0, 0], fontStyle: 'bold' }
+                headStyles: { 
+                    fillColor: [27, 79, 114], 
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                bodyStyles: {
+                    textColor: [51, 51, 51]
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 244, 248] 
+                },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' }, 
+                    1: { cellWidth: 25, halign: 'center' }, 
+                    2: { cellWidth: 20, halign: 'center' }, 
+                    3: { cellWidth: 20, halign: 'center' }, 
+                    4: { cellWidth: 20, halign: 'center' }, 
+                    5: { cellWidth: 20, halign: 'center' }, 
+                    6: { cellWidth: 20, halign: 'center' }, 
+                    7: { cellWidth: 35 }, 
+                    8: { cellWidth: 35 }, 
+                    9: { cellWidth: 35 }, 
+                    10: { cellWidth: 35 } 
+                },
+                foot: [[{ content: 'Total:', colSpan: 6, styles: { halign: 'right' } }, `${grandTotal.toFixed(2)} Kg`, '', '', '', '']],
+                footStyles: { 
+                    fillColor: [238, 238, 238], 
+                    textColor: [0, 0, 0], 
+                    fontStyle: 'bold' 
+                },
+                didDrawPage: function (data) {
+                    // Halaman bawah dikosongkan (nomor halaman dihilangkan)
+                }
             });
 
             let filename = `Laporan_Foodtray_${mulai}_sd_${sampai}.pdf`;
